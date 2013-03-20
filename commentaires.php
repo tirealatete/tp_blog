@@ -29,13 +29,13 @@
 		FROM billets WHERE id=?');
 	$req->execute(array($_GET['id']));
 
-	while ( $donnees= $req->fetch()) {
+	$donnees= $req->fetch();
 		echo '<div class="news">
 				<h3>' . htmlspecialchars($donnees['titre']) . '<EM> le ' . htmlspecialchars($donnees['date_creation']) . ' à ' . htmlspecialchars($donnees['heure_creation']) . '</EM></h3>
 				<p>' . htmlspecialchars($donnees['contenu']) .'</br></p>
 			</div>
 			</br>';
-	}
+	
 	$req->closeCursor();
 ?>
 
