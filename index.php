@@ -21,18 +21,30 @@
 	{
 		die('Erreur : '.$e->getMessage());
 	}
+
+	// Récupération des billets
 	$bdd->query("SET NAMES 'utf8'");
 	$reponse = $bdd->query('SELECT titre, contenu, id,
-		DATE_FORMAT(date_creation, \'%d/%m\') AS date_creation, 
-		DATE_FORMAT(date_creation, \'%Hh%i\') AS heure_creation
+		DATE_FORMAT(date_creation, \'%d/%m à %Hh%imin\') AS date_creation
 		FROM billets ORDER BY id DESC LIMIT 0, 10');
 
-	while ( $donnees= $reponse->fetch()) {
-		echo '<div class="news"><h3>' . htmlspecialchars($donnees['titre']) . '<EM> le ' . htmlspecialchars($donnees['date_creation']) . ' à ' . htmlspecialchars($donnees['heure_creation']) . '</EM></h3>
-		<p>' . nl2br($donnees['contenu']) .'</br>
-		<a href="commentaires.php?id='. $donnees['id'] .'">Commentaires </a></p></div></br>';
+	//Affichage des billets
+	while ( $donnees= $reponse->fetch()) 
+	{
+?>
+	<div class="news">
+		<h3>
+			<?php echo htmlspecialchars($donnees['titre']); ?>
+			<em> le <?php echo htmlspecialchars($donnees['date_creation']); ?></em>
+		</h3>
+		<p>
+		<?php echo nl2br(htmlspecialchars($donnees['contenu'])); ?>
+		</br>
+		<a href="commentaires.php?id=<?php echo $donnees['id']; ?>">Commentaires </a></p>
+	</div>
+	
+<?php
 	}
-
 	$reponse->closeCursor();
 
 ?>

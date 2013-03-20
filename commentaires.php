@@ -24,18 +24,22 @@
 
 	// Affichage du billet correspondant à l'ID
 	$req = $bdd->prepare('SELECT titre, contenu, id,
-		DATE_FORMAT(date_creation, \'%d/%m\') AS date_creation, 
-		DATE_FORMAT(date_creation, \'%Hh%i\') AS heure_creation
+		DATE_FORMAT(date_creation, \'%d/%m à %Hh%imin\') AS date_creation
 		FROM billets WHERE id=?');
 	$req->execute(array($_GET['id']));
 
 	$donnees= $req->fetch();
-		echo '<div class="news">
-				<h3>' . htmlspecialchars($donnees['titre']) . '<EM> le ' . htmlspecialchars($donnees['date_creation']) . ' à ' . htmlspecialchars($donnees['heure_creation']) . '</EM></h3>
-				<p>' . htmlspecialchars($donnees['contenu']) .'</br></p>
-			</div>
-			</br>';
-	
+?>
+	<div class="news">
+		<h3>
+			<?php echo htmlspecialchars($donnees['titre']); ?>
+			<em> le <?php echo htmlspecialchars($donnees['date_creation']); ?></em>
+		</h3>
+		<p><?php echo nl2br(htmlspecialchars($donnees['contenu'])); ?></br></p>
+	</div>
+	</br>
+
+<?php
 	$req->closeCursor();
 ?>
 
@@ -44,16 +48,16 @@
 <?php
 	// Affichage des commentaires correspondant à l'ID du billet
 	$req = $bdd->prepare('SELECT auteur, commentaire,
-		DATE_FORMAT(date_commentaire, \'%d/%m\') AS date_creation, 
-		DATE_FORMAT(date_commentaire, \'%Hh%i\') AS heure_creation
+		DATE_FORMAT(date_commentaire, \'%d/%m à %Hh%imin\') AS date_creation
 		FROM commentaires WHERE id_billet=?');
 	$req->execute(array($_GET['id']));
 
-	while ( $donnees= $req->fetch()) {
-		echo '
-		<p><strong>'. htmlspecialchars($donnees['auteur']) .'</strong> le '. htmlspecialchars($donnees['date_creation']) .' à '. htmlspecialchars($donnees['heure_creation']) .'</br>
-		'. htmlspecialchars($donnees['commentaire']) .'</p>
-		';
+	while ( $donnees= $req->fetch()) 
+	{
+?>
+		<p><strong><?php echo htmlspecialchars($donnees['auteur']); ?></strong> le <?php echo htmlspecialchars($donnees['date_creation']); ?></br>
+		<?php echo nl2br(htmlspecialchars($donnees['commentaire'])); ?></p>
+<?php
 	}
 	$req->closeCursor();
 ?>
