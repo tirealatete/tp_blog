@@ -31,15 +31,9 @@
 	//Affichage des billets
 	while ( $donnees= $reponse->fetch()) 
 	{
-?>
+	?>
 	<div class="news">
-		<h3>
-			<?php echo htmlspecialchars($donnees['titre']); ?>
-			<em> le <?php echo htmlspecialchars($donnees['date_creation']); ?></em>
-		</h3>
-		<p>
-		<?php echo nl2br(htmlspecialchars($donnees['contenu'])); ?>
-		</br>
+		<?php include("billet.php"); ?></br>
 		<a href="commentaires.php?id=<?php echo $donnees['id']; ?>">Commentaires </a></p>
 	</div>
 	

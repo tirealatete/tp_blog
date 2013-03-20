@@ -31,19 +31,14 @@
 	$donnees= $req->fetch();
 ?>
 	<div class="news">
-		<h3>
-			<?php echo htmlspecialchars($donnees['titre']); ?>
-			<em> le <?php echo htmlspecialchars($donnees['date_creation']); ?></em>
-		</h3>
-		<p><?php echo nl2br(htmlspecialchars($donnees['contenu'])); ?></br></p>
+		<?php include("billet.php"); ?></br>
 	</div>
-	</br>
-
 <?php
 	$req->closeCursor();
 ?>
 
 	<p>COMMENTAIRES</p>
+
 
 <?php
 	// Affichage des commentaires correspondant à l'ID du billet
@@ -55,12 +50,14 @@
 	while ( $donnees= $req->fetch()) 
 	{
 ?>
-		<p><strong><?php echo htmlspecialchars($donnees['auteur']); ?></strong> le <?php echo htmlspecialchars($donnees['date_creation']); ?></br>
-		<?php echo nl2br(htmlspecialchars($donnees['commentaire'])); ?></p>
+
+	<p><strong><?php echo htmlspecialchars($donnees['auteur']); ?></strong> le <?php echo htmlspecialchars($donnees['date_creation']); ?></br>
+	<?php echo nl2br(htmlspecialchars($donnees['commentaire'])); ?></p>
+
 <?php
 	}
 	$req->closeCursor();
 ?>
-		
+
 	</body>
 </html>
