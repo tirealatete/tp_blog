@@ -29,12 +29,12 @@
 		FROM billets ORDER BY id DESC LIMIT 0, 10');
 
 	//Affichage des billets
-	while ( $donnees= $reponse->fetch()) 
+	while ( $donnees_billet= $reponse->fetch()) 
 	{
 	?>
 	<div class="news">
 		<?php include("billet.php"); ?></br>
-		<a href="commentaires.php?id=<?php echo $donnees['id']; ?>">Commentaires </a></p>
+		<a href="commentaires.php?id=<?php echo $donnees_billet['id']; ?>">Commentaires </a></p>
 	</div>
 	
 <?php

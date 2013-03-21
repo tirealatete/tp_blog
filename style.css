@@ -23,3 +23,7 @@ a {
 text-decoration: none;
 color: blue;
 }
+
+#form_commentaire {
+	text-align: center;
+}
