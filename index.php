@@ -7,12 +7,9 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 		<link rel="stylesheet" href="style.css" />
 	</head>
-	<body>
-		<h1>Mon super blog</h1>
-		</br>
-		<p>Derniers billets du blog :</p>
-		
+
 <?php
+
 	// Connexion à la base
 	try
 	{
@@ -22,16 +19,25 @@
 		die('Erreur : '.$e->getMessage());
 	}
 
-	// Récupération des billets
+	$req = $bdd->query('SELECT COUNT(*) AS nb_billets FROM billets');
+	$nbr_billets = $req->fetch();
+?>
+	<body>
+		<h1>Mon super blog</h1>
+		</br>
+		<p>Nombre de billets : <?php echo $nbr_billets['nb_billets']; ?></p>
+		<p>Derniers billets du blog :</p>
+		
+<?php // Récupération des billets
 	$bdd->query("SET NAMES 'utf8'");
-	$reponse = $bdd->query('SELECT titre, contenu, id,
+	$req = $bdd->query('SELECT titre, contenu, id,
 		DATE_FORMAT(date_creation, \'%d/%m à %Hh%imin\') AS date_creation
 		FROM billets ORDER BY id DESC LIMIT 0, 10');
 
 	//Affichage des billets
-	while ( $donnees_billet= $reponse->fetch()) 
+	while ( $donnees_billet= $req->fetch()) 
 	{
-	?>
+?>
 	<div class="news">
 		<?php include("billet.php"); ?></br>
 		<a href="commentaires.php?id=<?php echo $donnees_billet['id']; ?>">Commentaires </a></p>
@@ -39,8 +45,7 @@
 	
 <?php
 	}
-	$reponse->closeCursor();
-
+	$req->closeCursor();
 ?>
 		
 	</body>

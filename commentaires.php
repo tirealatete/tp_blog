@@ -12,7 +12,7 @@
 		<a href="index.php">Retour à la liste des billets</a></br></br>
 		
 <?php
-// Connexion à la base
+	// Connexion à la base
 	try
 	{
 		$bdd = new PDO('mysql:host=localhost;dbname=blog', 'root', '');
@@ -22,52 +22,28 @@
 	}
 	$bdd->query("SET NAMES 'utf8'");
 
-	// Affichage du billet correspondant à l'ID
 	$req = $bdd->prepare('SELECT titre, contenu, id,
 		DATE_FORMAT(date_creation, \'%d/%m à %Hh%imin\') AS date_creation
 		FROM billets WHERE id=?');
 	$req->execute(array($_GET['id']));
 
 	$donnees_billet= $req->fetch();
+	if (!empty($donnees_billet)) {
 ?>
 	<div class="news">
-		Numero du billet : <?php echo $donnees_billet['id']; ?>
-		<?php include("billet.php"); ?></br>
+		<?php include("billet.php"); ?></br> <!-- Affichage du billet -->
 	</div>
-<?php
-	$req->closeCursor();
+	<?php include("commentaire.php"); ?>  <!-- Affichage de la zone commentaires -->
+<?php	
+	} else {
 ?>
-
-	<p>COMMENTAIRES</p>
-
-	
-<?php
-	// Affichage des commentaires correspondant à l'ID du billet
-	$req = $bdd->prepare('SELECT auteur, commentaire,
-		DATE_FORMAT(date_commentaire, \'%d/%m à %Hh%imin\') AS date_creation
-		FROM commentaires WHERE id_billet=?');
-	$req->execute(array($_GET['id']));
-
-	while ( $donnees= $req->fetch()) 
-	{
-?>
-
-	<p><strong><?php echo htmlspecialchars($donnees['auteur']); ?></strong> le <?php echo htmlspecialchars($donnees['date_creation']); ?></br>
-	<?php echo nl2br(htmlspecialchars($donnees['commentaire'])); ?></p>
-
+	<div class="news">
+			Ce billet n'existe pas
+	</div>
 <?php
 	}
 	$req->closeCursor();
 ?>
-	</br>
-	<div id="form_commentaire">
-	<p>Poster un message</p>
-		<form method="post" action="commentaire_post.php?id=<?php echo $donnees_billet['id']; ?>">
-			pseudo : <input type="text" name="pseudo" /></br>
-			<textarea name="message" rows="8" cols="45">Votre message ici.
-			</textarea></br>
-			<input type="submit" value="Envoyer"/>
-		</form>
-	</div>
+
 	</body>
 </html>
