@@ -10,6 +10,7 @@ Mustache_Autoloader::register();
 // Connexion à la base
 try {
 	$bdd = new PDO('mysql:host=localhost;dbname=blog', 'root', '');
+	$bdd->query("SET NAMES 'utf8'");
 } catch(Exception $e) {
 	die('Erreur : '.$e->getMessage());
 }
@@ -18,14 +19,15 @@ try {
 
 
 //----------------------------------------------------------------------//
-//              COMPTE LE NOMBRE DE BILLETS
+//              COMPTE LE NOMBRE TOTAL DE BILLETS
 //----------------------------------------------------------------------//
 $req = $bdd->query('
     SELECT 
-        COUNT(*) AS nb_billets 
-    FROM billets
+        COUNT(*) AS nb 
+    FROM 
+        billets
 ');
-$nbr_billets = $req->fetch();
+$nb_billets = $req->fetch();
 //----------------------------------------------------------------------//
 
 
@@ -33,25 +35,20 @@ $nbr_billets = $req->fetch();
 //----------------------------------------------------------------------//
 //              CHARGEMENT DES BILLETS
 //----------------------------------------------------------------------//
-$bdd->query("SET NAMES 'utf8'");
 $req = $bdd->query('
     SELECT 
-        titre, contenu, id, DATE_FORMAT(date_creation, \'%d/%m à %Hh%imin\') AS date_creation 
-    FROM billets 
+        titre, 
+        contenu, 
+        id, 
+        DATE_FORMAT(date_creation, \'%d/%m à %Hh%imin\') AS date_creation 
+    FROM 
+        billets 
     ORDER BY id DESC 
     LIMIT 0, 10
 ');
+$billets = $req->fetchAll();
 //----------------------------------------------------------------------//
 
-
-//----------------------------------------------------------------------//
-//              MISE EN TABLEAU DES DONNEES
-//----------------------------------------------------------------------//
-$posts = array();
-while ($donnees_billet = $req->fetch()) { 
-    $posts[] = $donnees_billet;
-}
-//----------------------------------------------------------------------//
 
 
 //----------------------------------------------------------------------//
@@ -65,17 +62,18 @@ $req->closeCursor();
 //----------------------------------------------------------------------//
 //              PREPARATION DES DONNEES POUR LA VUE
 //----------------------------------------------------------------------//
-$DATA = array(
-    "NB" => $nbr_billets['nb_billets'],
-    "POSTS" => $posts,
+$data = array(
+    "NB"        => $nb_billets['nb'],
+    "POSTS"     => $billets,
 );
 //----------------------------------------------------------------------//
+
 
 
 //----------------------------------------------------------------------//
 //              RECUPERATION DU TEMPLATE (ou vue)
 //----------------------------------------------------------------------//
-$template = file_get_contents('View_Index.html');
+$html = file_get_contents('View_Index.html');
 //----------------------------------------------------------------------//
 
 
@@ -84,7 +82,7 @@ $template = file_get_contents('View_Index.html');
 //              AFFICHAGE
 //----------------------------------------------------------------------//
 $m = new Mustache_Engine();
-echo $m->render($template, $DATA); 
+echo $m->render($html, $data); 
 //----------------------------------------------------------------------//
 
 ?>
