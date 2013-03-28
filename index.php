@@ -1,51 +1,90 @@
 <?php
 
-	// Connexion à la base
-	try
-	{
-		$bdd = new PDO('mysql:host=localhost;dbname=blog', 'root', '');
-	} catch(Exception $e)
-	{
-		die('Erreur : '.$e->getMessage());
-	}
+//----------------------------------------------------------------------//
+//              INITIALISATION
+//----------------------------------------------------------------------//
+// Chargement de Mustache.
+require 'mustache/src/Mustache/Autoloader.php';
+Mustache_Autoloader::register();
 
-	$req = $bdd->query('
-	    SELECT 
-	        COUNT(*) AS nb_billets 
-	    FROM billets
-    ');
-	$nbr_billets = $req->fetch();
-	
-	// Récupération des billets
-    $bdd->query("SET NAMES 'utf8'");
-    $req = $bdd->query('
-        SELECT 
-            titre, contenu, id, DATE_FORMAT(date_creation, \'%d/%m à %Hh%imin\') AS date_creation 
-        FROM billets 
-        ORDER BY id DESC 
-        LIMIT 0, 10
-    ');
-	
+// Connexion à la base
+try {
+	$bdd = new PDO('mysql:host=localhost;dbname=blog', 'root', '');
+} catch(Exception $e) {
+	die('Erreur : '.$e->getMessage());
+}
+//----------------------------------------------------------------------//
+
+
+
+//----------------------------------------------------------------------//
+//              COMPTE LE NOMBRE DE BILLETS
+//----------------------------------------------------------------------//
+$req = $bdd->query('
+    SELECT 
+        COUNT(*) AS nb_billets 
+    FROM billets
+');
+$nbr_billets = $req->fetch();
+//----------------------------------------------------------------------//
+
+
+
+//----------------------------------------------------------------------//
+//              CHARGEMENT DES BILLETS
+//----------------------------------------------------------------------//
+$bdd->query("SET NAMES 'utf8'");
+$req = $bdd->query('
+    SELECT 
+        titre, contenu, id, DATE_FORMAT(date_creation, \'%d/%m à %Hh%imin\') AS date_creation 
+    FROM billets 
+    ORDER BY id DESC 
+    LIMIT 0, 10
+');
+//----------------------------------------------------------------------//
+
+
+//----------------------------------------------------------------------//
+//              MISE EN TABLEAU DES DONNEES
+//----------------------------------------------------------------------//
+$posts = array();
+while ($donnees_billet = $req->fetch()) { 
+    $posts[] = $donnees_billet;
+}
+//----------------------------------------------------------------------//
+
+
+//----------------------------------------------------------------------//
+//              FERMETURE DE LA BASE
+//----------------------------------------------------------------------//
+$req->closeCursor();
+//----------------------------------------------------------------------//
+
+
+
+//----------------------------------------------------------------------//
+//              PREPARATION DES DONNEES POUR LA VUE
+//----------------------------------------------------------------------//
+$DATA = array(
+    "NB" => $nbr_billets['nb_billets'],
+    "POSTS" => $posts,
+);
+//----------------------------------------------------------------------//
+
+
+//----------------------------------------------------------------------//
+//              RECUPERATION DU TEMPLATE (ou vue)
+//----------------------------------------------------------------------//
+$template = file_get_contents('View_Index.html');
+//----------------------------------------------------------------------//
+
+
+
+//----------------------------------------------------------------------//
+//              AFFICHAGE
+//----------------------------------------------------------------------//
+$m = new Mustache_Engine();
+echo $m->render($template, $DATA); 
+//----------------------------------------------------------------------//
+
 ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="fr" lang="fr">
-	<head>
-		<title>Mon super Blog</title>
-		<meta charset="utf-8" />
-		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
-		<link rel="stylesheet" href="style.css" />
-	</head>
-	<body>
-		<h1>Mon super blog</h1>
-		</br>
-		<p>Nombre de billets : <?php echo $nbr_billets['nb_billets']; ?></p>
-		<p>Derniers billets du blog :</p>
-        <?php while ( $donnees_billet= $req->fetch()) { ?>
-	    <div class="news">
-		    <?php include("billet.php"); ?></br>
-		    <a href="commentaires.php?id=<?php echo $donnees_billet['id']; ?>">Commentaires </a></p>
-	    </div>
-        <?php }?>
-	</body>
-</html>
-<?php $req->closeCursor(); ?>
